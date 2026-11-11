@@ -153,6 +153,9 @@ const char* my_str_error(const error_code_e error_code) {
         case POP_VOID_STACK:
             return "POP_VOID_STACK: 19";
 
+        case SYSTEM_ERROR:
+            return "SYSTEM_ERROR: 20";
+
         case INIT_VALUE:
             return "INIT VALUE: -1";
 

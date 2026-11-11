@@ -63,6 +63,7 @@ enum error_code_e {
     ZERO_CAPACITY        = 17,
     SIZE_HIGHER_CAPACITY = 18,
     POP_VOID_STACK       = 19,
+    SYSTEM_ERROR         = 20,
     INIT_VALUE           = -1,
     UNEXPECTED_ERROR     = -2,
 };
