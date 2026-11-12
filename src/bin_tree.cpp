@@ -67,6 +67,10 @@ error_code_e bin_tree_destroy(bin_tree_s* const bin_tree) {
 
 
 error_code_e bin_tree_insert(bin_tree_s* const bin_tree, node_s** const node, bin_tree_elem elem) {
+    assert(bin_tree != NULL);
+    assert(node != NULL);
+
+    SAFE_CALL( bin_tree_verify(bin_tree), );
 
     *node = (node_s*)calloc(1, sizeof(node_s));
     (*node)->left  = NULL;
@@ -83,6 +87,8 @@ error_code_e bin_tree_del(bin_tree_s* const bin_tree, node_s** const node) {
     assert(node != NULL);
     assert(bin_tree->count_nodes > 0);
 
+    SAFE_CALL( bin_tree_verify(bin_tree), );
+
     free(*node);
     *node = NULL;
     bin_tree->count_nodes--;
@@ -92,23 +98,45 @@ error_code_e bin_tree_del(bin_tree_s* const bin_tree, node_s** const node) {
 }
 
 
-error_code_e bin_tree_verify (const bin_tree_s* const bin_tree) {
+error_code_e bin_tree_verify(bin_tree_s* const bin_tree) {
+    assert(bin_tree != NULL);
+
+    ON_DBG(bin_tree_dmp(bin_tree);)
+
     return SUCCESS;
 }
 
 
 error_code_e bin_tree_print_postorder(bin_tree_s* const bin_tree, char** buffer) {
     assert(bin_tree != NULL);
+    assert(buffer   != NULL);
+
+    if (bin_tree->count_nodes == 0) {
+        *buffer = (char*)calloc(3, sizeof(char));
+
+        if (*buffer == NULL) {
+            LOG_ERROR("allocation error");
+            LOG_OK("stack_push successfully");
+            return ALLOCATION_ERROR;
+        }
+
+        (*buffer)[0] = '(';
+        (*buffer)[1] = ')';
+        (*buffer)[2] = '\0';
+
+        return SUCCESS;
+    }
 
     ssize_t count_nodes = bin_tree->count_nodes;
     *buffer             = (char*)calloc((size_t)count_nodes * 10, sizeof(char));
-    ssize_t count_write = 0;
 
     if (*buffer == NULL) {
         LOG_ERROR("allocation error");
+        LOG_OK("stack_push successfully");
         return ALLOCATION_ERROR;
     }
 
+    ssize_t count_write = 0;
     ON_DBG(ssize_t cnt  = 0;)
     node_s**   node     = NULL;
     stack_s    stack    = {};
@@ -160,15 +188,23 @@ void bin_tree_dmp(bin_tree_s* const bin_tree) {
     char* buffer;
     bin_tree_print_postorder(bin_tree, &buffer);
 
-    if (bin_tree_img(bin_tree) != SUCCESS) {
-        LOG_ERROR("cant generate bin_tree img");
-        return;
+    error_code_e error_code = INIT_VALUE;
+    if (bin_tree->count_nodes > 0) {
+        error_code = bin_tree_img(bin_tree);
     }
 
     LOG("bin_tree %p {",               bin_tree);
     LOG("bin_tree->count_nodes = %zd", bin_tree->count_nodes);
     LOG("POSTORDER: %s", buffer);
     LOG("}");
+
+    if (error_code == INIT_VALUE) {
+        LOG_OK("void bin_tree");
+        return;
+    } if (error_code != SUCCESS) {
+        LOG_ERROR("cant generate bin_tree img");
+        return;
+    }
 
     free(buffer);
     buffer = NULL;
@@ -229,6 +265,11 @@ error_code_e bin_tree_img(bin_tree_s* const bin_tree) {
     if (dot_file == NULL) {
         LOG_ERROR("cant open dot file");
         return ERROR_DURING_OPEN;
+    }
+
+    if (bin_tree->count_nodes == 0) {
+        LOG_OK("void bin_tree cant be convert in img");
+        return INCORRECT_SIZE;
     }
 
     fprintf(dot_file,   "digraph {\n"
