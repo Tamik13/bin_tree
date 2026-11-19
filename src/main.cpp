@@ -54,7 +54,7 @@ node_s* bin_search_tree_find(bin_tree_s* const bin_tree, bin_tree_elem elem) {
     node_s** node = &bin_tree->root;
 
     for (ssize_t cnt = 0; cnt < bin_tree->count_nodes; cnt++) {
-        if((*node)->data == elem) {
+        if(*node != NULL && (*node)->data == elem) {
             return *node;
         } if ((*node)->left != NULL && elem < (*node)->data) {
             node = &(*node)->left;

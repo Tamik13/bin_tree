@@ -61,7 +61,7 @@ error_code_e bin_tree_destroy(bin_tree_s* const bin_tree) {
     }
 
     SAFE_CALL(stack_destroy(&stack), );
-    LOG_OK("bin_tree_dfs successfully");
+    LOG_OK("bin_tree_destroy successfully");
     return SUCCESS;
 }
 
@@ -73,6 +73,12 @@ error_code_e bin_tree_insert(bin_tree_s* const bin_tree, node_s** const node, bi
     SAFE_CALL( bin_tree_verify(bin_tree), );
 
     *node = (node_s*)calloc(1, sizeof(node_s));
+
+    if (*node == NULL) {
+        LOG_ERROR("cant calloc *node");
+        return ALLOCATION_ERROR;
+    }
+
     (*node)->left  = NULL;
     (*node)->right = NULL;
     (*node)->data  = elem;
@@ -128,7 +134,7 @@ error_code_e bin_tree_print_postorder(bin_tree_s* const bin_tree, char** buffer)
     }
 
     ssize_t count_nodes = bin_tree->count_nodes;
-    *buffer             = (char*)calloc((size_t)count_nodes * 10, sizeof(char));
+    *buffer             = (char*)calloc((size_t)count_nodes * 20, sizeof(char));
 
     if (*buffer == NULL) {
         LOG_ERROR("allocation error");
@@ -177,7 +183,7 @@ error_code_e bin_tree_print_postorder(bin_tree_s* const bin_tree, char** buffer)
 
     SAFE_CALL(stack_destroy(&stack), );
 
-    LOG_OK("stack_push successfully");
+    LOG_OK("stack_postorder successfully");
     return SUCCESS;
 }
 
