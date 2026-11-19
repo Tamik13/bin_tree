@@ -36,4 +36,4 @@ typedef double bin_tree_elem;
 
 Подробная текстовое и графическое логирование в html формате, для отключения графического дампа выключите дебаг режим в файле include/debugging.h
 
-![](logs/log_exemple.png)
+![](src/log_exemple.png)
